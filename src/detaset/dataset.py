@@ -35,7 +35,7 @@ class DatasetLoader():
         mapping = dict()
 
         with open(path) as f:
-            for index, line in enumerate(f.readlines):
+            for index, line in enumerate(f.readlines()):
                 name, description = line[:-1].split(' ', maxsplit=1)
 
                 mapping[name] = {
@@ -51,6 +51,14 @@ class DatasetLoader():
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
                 filename = line.split(' ')[0]
+                
+                image_path = os.path.join(self.image_folder, filename + '.JPEG')
+                annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
+
+                if not os.path.exists(image_path) or not os.path.exists(annotation_path):
+                    tf.print("Problem with file: ", image_path)
+                    continue
+
                 file_list.append(filename)
 
         if self.shuffle:
@@ -82,7 +90,7 @@ class DatasetLoader():
         for coord_name in coords_tag_names:
             coord_values = []
             for coord in root.iter(coord_name):
-                coord_values.append(int(coord))
+                coord_values.append(int(coord.text))
             coords.append(coord_values)
 
         coords = np.stack(coords, axis=1)
@@ -102,7 +110,7 @@ class DatasetLoader():
             annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
 
             if not os.path.exists(image_path) or not os.path.exists(annotation_path):
-                tf.print("Problem with file: ", filename)
+                tf.print("Problem with file: ", image_path)
                 continue
 
             annotations.append(self.__parse_xml(annotation_path))
@@ -112,7 +120,7 @@ class DatasetLoader():
             if counter > max and max != 0:
                 break
 
-        return len(annotations), zip(image_paths, annotations)
+        return zip(image_paths, annotations)
 
 
     def load_meta(self, max_objects: int=0):
