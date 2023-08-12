@@ -121,7 +121,7 @@ class DatasetLoader():
         self.objects = self.__load_objects(max=max_objects)
 
 
-    def generator(self, image_size: tuple(int, int)=None, shuffle: bool=False, max: int=0):
+    def generator(self, image_size: tuple=None, shuffle: bool=False, max: int=0):
         self.shuffle = shuffle
         self.image_size = image_size
         
@@ -150,7 +150,7 @@ class DatasetLoader():
             yield image, annotation
 
     
-    def __call__(self, image_size: tuple(int, int)=None, shuffle: bool=False, max: int=0, batch_size: int=0):
+    def __call__(self, image_size: tuple=None, shuffle: bool=False, max: int=0, batch_size: int=0):
         dataset = tf.data.Dataset.from_generator(
             generator=self.generator,
             args=(image_size, shuffle, max),

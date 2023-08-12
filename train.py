@@ -7,10 +7,11 @@ import tensorflow as tf
 batch_size = 32
 
 # Loading Datasets
-dataset_loader = DatasetLoader('dataset_path', volume='train')
+train_dataset_loader = DatasetLoader('dataset_path', volume='train')
+train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
 
-train_dataset = dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
-validation_dataset = dataset_loader(image_size=(256, 256), shuffle=False)
+validation_dataset_loader = DatasetLoader('dataset_path', volume='train')
+validation_dataset = validation_dataset_loader(image_size=(256, 256), shuffle=False)
 
 # Training model
 alexnet = instantiate_model(input_shape=(256, 256, 3))
