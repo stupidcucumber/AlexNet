@@ -1,6 +1,6 @@
 import tensorflow as tf
 import os
-import xml.etree.ElementTree as ET
+import xml.etree.cElementTree as ET
 import numpy as np
 import cv2
 
@@ -51,12 +51,11 @@ class DatasetLoader():
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
                 filename = line.split(' ')[0]
-                
+
                 image_path = os.path.join(self.image_folder, filename + '.JPEG')
                 annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
 
                 if not os.path.exists(image_path) or not os.path.exists(annotation_path):
-                    tf.print("Problem with file: ", image_path)
                     continue
 
                 file_list.append(filename)
@@ -86,22 +85,17 @@ class DatasetLoader():
         for name in root.iter('name'):
             class_name = name.text
             class_names.append(class_name)
+            break
 
         for coord_name in coords_tag_names:
-            coord_values = []
             for coord in root.iter(coord_name):
-                coord_values.append(int(coord.text))
-            coords.append(coord_values)
+                coords.append(int(coord.text))
+                break
 
-        coords = np.stack(coords, axis=1)
-
-        return list(zip(class_names, coords))[0]
+        return class_names[0], coords
     
 
     def __load_objects(self, max: int=0):
-        annotations = []
-        image_paths = []
-
         filenames = self.__load_metadata_filenames()
         
         counter = 0
@@ -109,18 +103,13 @@ class DatasetLoader():
             image_path = os.path.join(self.image_folder, filename + '.JPEG')
             annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
 
-            if not os.path.exists(image_path) or not os.path.exists(annotation_path):
-                tf.print("Problem with file: ", image_path)
-                continue
-
-            annotations.append(self.__parse_xml(annotation_path))
-            image_paths.append(image_path)
+            annotation = self.__parse_xml(annotation_path)
             counter += 1
 
             if counter > max and max != 0:
                 break
-
-        return zip(image_paths, annotations)
+            
+            yield image_path, annotation
 
 
     def load_meta(self, max_objects: int=0):
@@ -158,7 +147,7 @@ class DatasetLoader():
             yield image, annotation
 
     
-    def __call__(self, image_size: tuple=None, shuffle: bool=False, max: int=0, batch_size: int=0):
+    def __call__(self, image_size: tuple=None, shuffle: bool=False, max: int=0, batch_size: int=1):
         dataset = tf.data.Dataset.from_generator(
             generator=self.generator,
             args=(image_size, shuffle, max),
@@ -169,9 +158,8 @@ class DatasetLoader():
         )
 
         if shuffle:
-            dataset = dataset.shuffle(buffer_size=100)
+            dataset = dataset.shuffle(buffer_size=3)
 
-        if batch_size > 0:
-            dataset = dataset.batch(batch_size)
+        dataset = dataset.batch(batch_size)
 
         return dataset

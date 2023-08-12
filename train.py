@@ -5,12 +5,13 @@ import tensorflow as tf
 
 # Hyperparameters
 batch_size = 32
+root_folder = ""
 
 # Loading Datasets
-train_dataset_loader = DatasetLoader('dataset_path', volume='train')
+train_dataset_loader = DatasetLoader(root_folder, volume='train')
 train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
 
-validation_dataset_loader = DatasetLoader('dataset_path', volume='train')
+validation_dataset_loader = DatasetLoader(root_folder, volume='val')
 validation_dataset = validation_dataset_loader(image_size=(256, 256), shuffle=False)
 
 # Training model
