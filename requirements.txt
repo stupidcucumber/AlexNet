@@ -1,0 +1,4 @@
+tensorflow==2.13.*
+opencv-python
+lxml
+numpy

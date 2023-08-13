@@ -4,15 +4,15 @@ from src.utils.callbacks.checkpoint import TrimmedModelCheckpoint
 import tensorflow as tf
 
 # Hyperparameters
-batch_size = 32
+batch_size = 1 #TODO: fix bug when the batch_size is bigger than 1
 root_folder = ""
 
 # Loading Datasets
 train_dataset_loader = DatasetLoader(root_folder, volume='train')
-train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
+train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, max=600000, batch_size=batch_size)
 
 validation_dataset_loader = DatasetLoader(root_folder, volume='val')
-validation_dataset = validation_dataset_loader(image_size=(256, 256), shuffle=False)
+validation_dataset = validation_dataset_loader(image_size=(256, 256), max=1000, shuffle=False)
 
 # Training model
 alexnet = instantiate_model(input_shape=(256, 256, 3))

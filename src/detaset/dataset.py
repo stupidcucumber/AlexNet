@@ -47,6 +47,7 @@ class DatasetLoader():
 
     def __load_metadata_filenames(self):
         file_list = []
+        tf.print("Start loading filenames file...")
 
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
@@ -62,6 +63,8 @@ class DatasetLoader():
 
         if self.shuffle:
             np.random.shuffle(file_list)
+
+        tf.print("Filenames has been loaded!")
 
         return file_list
     
@@ -136,7 +139,7 @@ class DatasetLoader():
                 image = base_image[y: ymax, x: xmax]
                 image = cv2.resize(image, dsize=self.image_size) / 255.
             except Exception as e:
-                tf.print("Caught an exception: ", e)
+                tf.print("\nCaught an exception: ", e)
                 tf.print("Image path: ", image_path)
                 continue
 
