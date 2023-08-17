@@ -106,7 +106,13 @@ class DatasetLoader():
             image_path = os.path.join(self.image_folder, filename + '.JPEG')
             annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
 
-            annotation = self.__parse_xml(annotation_path)
+            try:
+                annotation = self.__parse_xml(annotation_path)
+            except Exception as e:
+                tf.print("\n Exception caught: ", e)
+                tf.print("Annotation path: ", annotation_path)
+                continue
+            
             counter += 1
 
             if counter > max and max != 0:
@@ -161,7 +167,7 @@ class DatasetLoader():
         )
 
         if shuffle:
-            dataset = dataset.shuffle(buffer_size=3)
+            dataset = dataset.shuffle(buffer_size=100)
 
         dataset = dataset.batch(batch_size)
 
