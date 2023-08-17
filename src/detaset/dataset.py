@@ -18,6 +18,7 @@ class DatasetLoader():
             volume: which part of the dataset to include ("train"/"val")
         """
         self.root_folder = root_folder
+        self.volume = volume
 
         self.image_folder = os.path.join(root_folder, 'Data/CLS-LOC', volume)
         self.annotations_folder = os.path.join(root_folder, 'Annotations/CLS-LOC', volume)
@@ -48,6 +49,7 @@ class DatasetLoader():
     def __load_metadata_filenames(self):
         file_list = []
         tf.print("Start loading filenames file...")
+        loc_file = os.path.join(self.root_folder, 'ImageSets/CLS-LOC', 'train_loc.txt') 
 
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
@@ -61,8 +63,22 @@ class DatasetLoader():
 
                 file_list.append(filename)
 
+        with open(loc_file) as f:
+            for line in f.readlines():
+                filename = line.split(' ')[0]
+
+                image_path = os.path.join(self.image_folder, filename + '.JPEG')
+                annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
+
+                if not os.path.exists(image_path) or not os.path.exists(annotation_path):
+                    continue
+
+                file_list.append(filename)
+
         if self.shuffle:
             np.random.shuffle(file_list)
+
+        tf.print("Total number of files accessible: ", len(file_list))
 
         tf.print("Filenames has been loaded!")
 
