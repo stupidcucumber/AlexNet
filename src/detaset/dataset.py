@@ -165,11 +165,7 @@ class DatasetLoader():
                 tf.print("Image path: ", image_path)
                 continue
 
-            annotation = np.zeros(1000)
-            annotation[self.mapping[class_name]['class_id']] = 1
-            annotation = tf.convert_to_tensor(annotation, dtype=tf.float32)
-
-            yield image, annotation
+            yield image, self.mapping[class_name]['class_id']
 
     
     def __call__(self, image_size: tuple=None, shuffle: bool=False, max: int=0, batch_size: int=1):
@@ -178,7 +174,7 @@ class DatasetLoader():
             args=(image_size, shuffle, max),
             output_signature=(
                 tf.TensorSpec(shape=(256, 256, 3), dtype=tf.float32),
-                tf.TensorSpec(shape=(1000), dtype=tf.float32)
+                tf.TensorSpec(shape=(), dtype=tf.float32)
             )
         )
 

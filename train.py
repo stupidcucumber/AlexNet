@@ -9,7 +9,7 @@ root_folder = ""
 
 # Loading Datasets
 train_dataset_loader = DatasetLoader(root_folder, volume='train')
-train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
+train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, max=1000000, batch_size=batch_size)
 
 validation_dataset_loader = DatasetLoader(root_folder, volume='val')
 validation_dataset = validation_dataset_loader(image_size=(256, 256), max=1000, shuffle=False)
@@ -20,7 +20,7 @@ print(alexnet.summary())
 
 alexnet.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.009),
-    loss=tf.keras.losses.CategoricalCrossentropy(),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
     metrics=['accuracy']
 )
 
