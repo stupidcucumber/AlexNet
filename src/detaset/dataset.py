@@ -46,10 +46,12 @@ class DatasetLoader():
         return mapping
     
 
-    def __load_metadata_filenames(self):
+    def __load_metadata_filenames(self, max: int=0):
         file_list = []
         tf.print("Start loading filenames file...")
         loc_file = os.path.join(self.root_folder, 'ImageSets/CLS-LOC', 'train_loc.txt') 
+
+        counter = 0
 
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
@@ -61,19 +63,35 @@ class DatasetLoader():
                 if not os.path.exists(image_path) or not os.path.exists(annotation_path):
                     continue
 
-                file_list.append(filename)
+                if not (filename in file_list):
+                    file_list.append(filename)
 
-        with open(loc_file) as f:
-            for line in f.readlines():
-                filename = line.split(' ')[0]
+                    counter += 1
+                    if counter % 10000 == 0:
+                        print("\rThe number of images loaded: %d/%d" % (counter, max))
 
-                image_path = os.path.join(self.image_folder, filename + '.JPEG')
-                annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
+                    if counter == max:
+                        break
 
-                if not os.path.exists(image_path) or not os.path.exists(annotation_path):
-                    continue
+        if self.volume == 'train':
+            with open(loc_file) as f:
+                for line in f.readlines():
+                    if counter == max:
+                        break
+                    filename = line.split(' ')[0]
 
-                file_list.append(filename)
+                    image_path = os.path.join(self.image_folder, filename + '.JPEG')
+                    annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
+
+                    if not os.path.exists(image_path) or not os.path.exists(annotation_path):
+                        continue
+
+                    if not (filename in file_list):
+                        file_list.append(filename)
+
+                        counter += 1
+                        if counter % 10000 == 0:
+                            print("\rThe number of images loaded: %d/%d" % (counter, max))
 
         if self.shuffle:
             np.random.shuffle(file_list)
@@ -115,7 +133,7 @@ class DatasetLoader():
     
 
     def __load_objects(self, max: int=0):
-        filenames = self.__load_metadata_filenames()
+        filenames = self.__load_metadata_filenames(max=max)
         
         counter = 0
         for filename in filenames:
