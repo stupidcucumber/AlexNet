@@ -91,7 +91,7 @@ class DatasetLoader():
 
                         counter += 1
                         if counter % 10000 == 0:
-                            print("\rThe number of images loaded: %d/%d" % (counter, max))
+                            print("The number of images loaded: %d/%d\r" % (counter, max))
 
         if self.shuffle:
             np.random.shuffle(file_list)
