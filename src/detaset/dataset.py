@@ -13,8 +13,6 @@ class DatasetLoader():
     def __init__(self, root_folder: str=None, volume: str=None):
         """
             root_folder: absolute/relative path to the dataset folder. For now only ImageNet dataset is supported.
-            image_size: a tuple like (640, 640) containing the object to classificate.
-            shuffle: whether to shuffle the dataset
             volume: which part of the dataset to include ("train"/"val")
         """
         self.root_folder = root_folder
@@ -49,10 +47,7 @@ class DatasetLoader():
     def __load_metadata_filenames(self, max: int=0):
         file_list = []
         tf.print("Start loading filenames file...")
-        loc_file = os.path.join(self.root_folder, 'ImageSets/CLS-LOC', 'train_loc.txt') 
-
         counter = 0
-
         with open(self.subset_file_definition) as f:
             for line in f.readlines():
                 filename = line.split(' ')[0]
@@ -68,36 +63,15 @@ class DatasetLoader():
 
                     counter += 1
                     if counter % 10000 == 0:
-                        print("\rThe number of images loaded: %d/%d" % (counter, max))
+                        print("The number of images loaded: %d/%d" % (counter, max), end='\r')
 
                     if counter == max:
                         break
-
-        if self.volume == 'train':
-            with open(loc_file) as f:
-                for line in f.readlines():
-                    if counter == max:
-                        break
-                    filename = line.split(' ')[0]
-
-                    image_path = os.path.join(self.image_folder, filename + '.JPEG')
-                    annotation_path = os.path.join(self.annotations_folder, filename + '.xml')
-
-                    if not os.path.exists(image_path) or not os.path.exists(annotation_path):
-                        continue
-
-                    if not (filename in file_list):
-                        file_list.append(filename)
-
-                        counter += 1
-                        if counter % 10000 == 0:
-                            print("The number of images loaded: %d/%d\r" % (counter, max))
 
         if self.shuffle:
             np.random.shuffle(file_list)
 
         tf.print("Total number of files accessible: ", len(file_list))
-
         tf.print("Filenames has been loaded!")
 
         return file_list
@@ -174,6 +148,7 @@ class DatasetLoader():
             class_name, coords = object[1]
             try:
                 base_image = cv2.imread(image_path)
+                base_image = cv2.cvtColor(base_image, cv2.COLOR_BGR2RGB)
                 x, y, xmax, ymax = coords
 
                 image = base_image[y: ymax, x: xmax]
@@ -191,7 +166,7 @@ class DatasetLoader():
             generator=self.generator,
             args=(image_size, shuffle, max),
             output_signature=(
-                tf.TensorSpec(shape=(256, 256, 3), dtype=tf.float32),
+                tf.TensorSpec(shape=(image_size[0], image_size[1], 3), dtype=tf.float32),
                 tf.TensorSpec(shape=(), dtype=tf.float32)
             )
         )
