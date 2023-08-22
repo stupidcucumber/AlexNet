@@ -7,6 +7,8 @@ import tensorflow as tf
 batch_size = 200
 root_folder = ""
 
+tf.random.set_seed(42)
+
 # Loading Datasets
 train_dataset_loader = DatasetLoader(root_folder, volume='train')
 train_dataset = train_dataset_loader(image_size=(256, 256), shuffle=True, batch_size=batch_size)
@@ -19,7 +21,7 @@ alexnet = instantiate_model(input_shape=(256, 256, 3))
 print(alexnet.summary())
 
 alexnet.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
     loss=tf.keras.losses.SparseCategoricalCrossentropy(),
     metrics=['accuracy']
 )
