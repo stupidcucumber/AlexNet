@@ -40,11 +40,13 @@ def instantiate_model(input_shape: tuple=(256, 256)):
     ])
 
     calculate_output = tf.keras.models.Sequential([
-        layers.MaxPool2D(pool_size=(3, 3), strides=(1, 1)),
+        layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
         layers.Flatten(),
-        layers.Dense(2048),
-        layers.Dropout(0.6),
-        layers.Dense(2048),
+        layers.Dense(1024),
+        layers.Dropout(0.5),
+        layers.Dense(1024),
+        layers.Dropout(0.5),
+        layers.Dense(1024),
         layers.Dropout(0.5),
         layers.Dense(1000, activation="softmax")
     ])

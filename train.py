@@ -21,45 +21,25 @@ validation_dataset = validation_dataset_loader(image_size=(256, 256), max=1000, 
 alexnet = instantiate_model(input_shape=(256, 256, 3))
 print(alexnet.summary())
 
-metrics_accuracy = tf.keras.metrics.CategoricalAccuracy()
 loss = tf.keras.losses.SparseCategoricalCrossentropy()
 
 alexnet.compile(
     optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
     loss=loss,
-    metrics=[metrics_accuracy]
+    metrics=['accuracy']
 )
 
 # Creating logs
 current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 log_dir = "logs/fit/" + current_time
-train_log_dir = 'logs/gradient_tape/' + current_time + '/train'
-test_log_dir = 'logs/gradient_tape/' + current_time + '/test'
-
-train_summary_writer = tf.summary.create_file_writer(train_log_dir)
-test_summary_writer = tf.summary.create_file_writer(test_log_dir)
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-
-
-class LogAccuracy(tf.keras.callbacks.Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        with train_summary_writer.as_default():
-            tf.summary.scalar('accuracy', metrics_accuracy.result(), step=epoch)
-            tf.summary.scalar('loss', loss.result(), step=epoch)
-
-        with test_summary_writer.as_default():
-            tf.summary.scalar('accuracy', metrics_accuracy.result(), step=epoch)
-            tf.summary.scalar('loss', loss.result(), step=epoch)
-
-        return super().on_epoch_end(epoch, logs)
-
-
+# Training model
 history = alexnet.fit(
     train_dataset,
     batch_size=batch_size,
     epochs=90,
-    callbacks=[TrimmedModelCheckpoint(), tensorboard_callback, LogAccuracy()],
+    callbacks=[TrimmedModelCheckpoint(), tensorboard_callback],
     validation_data=validation_dataset
 )
 

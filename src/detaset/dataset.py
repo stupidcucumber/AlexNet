@@ -58,15 +58,14 @@ class DatasetLoader():
                 if not os.path.exists(image_path) or not os.path.exists(annotation_path):
                     continue
 
-                if not (filename in file_list):
-                    file_list.append(filename)
+                file_list.append(filename)
 
-                    counter += 1
-                    if counter % 10000 == 0:
-                        print("The number of images loaded: %d/%d" % (counter, max), end='\r')
+                counter += 1
+                if counter % 10000 == 0:
+                    print("The number of images loaded: %d/%d" % (counter, max), end='\r')
 
-                    if counter == max:
-                        break
+                if counter == max and max != 0:
+                    break
 
         if self.shuffle:
             np.random.shuffle(file_list)
