@@ -41,6 +41,7 @@ class DatasetLoader():
                     "description": description,
                     "class_id": index
                 }
+                
         return mapping
     
 

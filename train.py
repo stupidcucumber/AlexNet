@@ -35,7 +35,7 @@ log_dir = "logs/fit/" + current_time
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 # Training model
-history = alexnet.fit(
+alexnet.fit(
     train_dataset,
     batch_size=batch_size,
     epochs=90,
@@ -44,6 +44,3 @@ history = alexnet.fit(
 )
 
 tf.print("Learning process is over!")
-tf.print("Writing history to the history-0.txt file")
-with open('checkpoints/history-0.txt', 'w') as f:
-    f.write(history)
