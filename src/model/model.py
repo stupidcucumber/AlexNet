@@ -57,7 +57,7 @@ def instantiate_model(input_shape: tuple=(256, 256)):
 
     output = calculate_output(x)
 
-    return tf.keras.models.Model(inputs=input, outputs=output)
+    return tf.keras.models.Model(inputs=input, outputs=output, name='AlexNet')
 
 
 class AlexNet():
@@ -68,6 +68,8 @@ class AlexNet():
             loss=tf.keras.losses.SparseCategoricalCrossentropy(),
             metrics=metrics
         )
+
+        tf.print(self.model.summary())
 
         self.input_shape = input_shape
         self.callbacks = callbacks
