@@ -11,7 +11,6 @@ parser.add_argument("-b", "--batch_size", action="store", default=128, type=int)
 parser.add_argument("-e", "--epochs", action="store", default=90, type=int)
 parser.add_argument("-p", "--path_data", action="store", type=str)
 parser.add_argument("-v", "--validate", action="store_true")
-parser.add_argument("-l", "--load-model", action="store_true")
 parser.add_argument("-m", "--model-path", action="store", type=str, help="If specified along with -l flag, the training will be started from pretrained model on the path.") 
 
 if __name__ == "__main__":
@@ -20,7 +19,6 @@ if __name__ == "__main__":
     input_shape = args['input_shape'], args['input_shape'], 3
     batch_size = args['batch_size']
     epochs = args['epochs']
-    load_model = args['load_model']
     model_path = args['model_path']
     data_path = args['path_data']
     validate = args['validate']
