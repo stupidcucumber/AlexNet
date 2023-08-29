@@ -1,8 +1,6 @@
 import tensorflow as tf
+from src.detaset.dataset import DatasetLoader
 
-class AlexNet(tf.keras.Model):
-    def __init__(self, **kwargs):
-        super(AlexNet, self).__init__(**kwargs)
 
 def instantiate_model(input_shape: tuple=(256, 256)):
     layers = tf.keras.layers
@@ -42,11 +40,9 @@ def instantiate_model(input_shape: tuple=(256, 256)):
     calculate_output = tf.keras.models.Sequential([
         layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
         layers.Flatten(),
-        layers.Dense(1024),
+        layers.Dense(2048),
         layers.Dropout(0.5),
-        layers.Dense(1024),
-        layers.Dropout(0.5),
-        layers.Dense(1024),
+        layers.Dense(2048),
         layers.Dropout(0.5),
         layers.Dense(1000, activation="softmax")
     ])
@@ -61,4 +57,46 @@ def instantiate_model(input_shape: tuple=(256, 256)):
 
     output = calculate_output(x)
 
-    return AlexNet(inputs=input, outputs=output)
+    return tf.keras.models.Model(inputs=input, outputs=output, name='AlexNet')
+
+
+class AlexNet():
+    def __init__(self, input_shape, metrics, callbacks):
+        self.model = instantiate_model(input_shape=input_shape)
+        self.model.compile(
+            optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            metrics=metrics
+        )
+
+        tf.print(self.model.summary())
+
+        self.input_shape = input_shape
+        self.callbacks = callbacks
+
+    
+    def __call__(self, input):
+        return self.model(input)
+    
+
+    def load_model(self, model_path):
+        self.model = tf.keras.models.load_model(model_path)
+
+
+    def train(self, batch_size=128, epochs=90, dataset_path="", validation=False):
+        train_dataset_loader = DatasetLoader(dataset_path, volume='train')
+        train_dataset = train_dataset_loader(image_size=self.input_shape, shuffle=True, batch_size=batch_size)
+
+        if validation:
+            validation_dataset_loader = DatasetLoader(dataset_path, volume='val')
+            validation_dataset = validation_dataset_loader(image_size=self.input_shape, max=1000, shuffle=False)
+        else:
+            validation_dataset=None
+
+        return self.model.fit(
+            train_dataset,
+            batch_size=batch_size,
+            epochs=epochs,
+            callbacks=self.callbacks,
+            validation_data=validation_dataset
+        )

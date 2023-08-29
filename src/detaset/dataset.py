@@ -41,6 +41,7 @@ class DatasetLoader():
                     "description": description,
                     "class_id": index
                 }
+                
         return mapping
     
 
@@ -127,6 +128,8 @@ class DatasetLoader():
             
             yield image_path, annotation
 
+        del filenames
+
 
     def load_meta(self, max_objects: int=0):
         mapping_path = os.path.join(self.root_folder, 'LOC_synset_mapping.txt')
@@ -158,6 +161,9 @@ class DatasetLoader():
                 continue
 
             yield image, self.mapping[class_name]['class_id']
+
+        del self.objects
+        del self.mapping
 
     
     def __call__(self, image_size: tuple=None, shuffle: bool=False, max: int=0, batch_size: int=1):
