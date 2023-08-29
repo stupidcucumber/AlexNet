@@ -59,7 +59,9 @@ You can train network by using Command-Line Interface. For now the following com
     </tr>
 </table>
 
-## Training Results
+## Training
+
+While training model saves the best results to the folder "checkpoint" and the intermediate result for each epoch in the folder "checkpoints-trimmed". Intermediate result is not full model, but only feature extraction part (without dense layers).
 
 Without augmentation and specific tuning of hyperparameters, such as SGD learning rate model reached ~40% accuracy on validation dataset:
 
